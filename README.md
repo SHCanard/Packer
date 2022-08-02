@@ -66,7 +66,7 @@ Launch **Packer** to make the build:
 packer build --force rhel-vmware.json
 ```
 
-**Create a KickStart ISO on Windows**
+**Create a KickStart ISO on Windows (if not using the full-http version)**
 
 After trying several methods, the best option seem to use the program CDBurnerXP, to install:
 
