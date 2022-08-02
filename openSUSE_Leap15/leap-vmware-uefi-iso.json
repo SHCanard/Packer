@@ -1,0 +1,91 @@
+{
+  "builders": [
+    {
+      "CPU_hot_plug": "false",
+      "CPUs": "{{user `vm-cpu-num`}}",
+      "RAM": "{{user `vm-mem-size`}}",
+      "RAM_reserve_all": false,
+	  "firmware": "efi",
+      "boot_command": [
+        "<esc>",
+        "e",
+        "<down><down><down><down>",
+        "<end><wait>",
+        "<spacebar>",
+        "netsetup=0 autoyast=device:///autoinst.xml<wait>",
+        "<leftCtrlOn>x<leftCtrlOff>"
+      ],
+      "boot_order": "disk,cdrom",
+      "boot_wait": "10s",
+      "cluster": "{{user `vsphere-cluster`}}",
+      "convert_to_template": true,
+      "cpu_cores": "{{user `vm-cpu-num`}}",
+      "datacenter": "{{user `vsphere-datacenter`}}",
+      "datastore": "{{user `vsphere-datastore`}}",
+      "disk_controller_type": "pvscsi",
+      "guest_os_type": "sles15_64Guest",
+      "insecure_connection": "true",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_paths": [
+        "{{user `iso_url`}}",
+        "{{user `ks_url`}}"
+      ],
+      "network_adapters": [
+        {
+          "network": "{{user `vsphere-network-front`}}",
+          "network_card": "vmxnet3"
+        },
+		{
+          "network": "{{user `vsphere-network-back`}}",
+          "network_card": "vmxnet3"
+        }
+      ],
+      "password": "{{user `vsphere-password`}}",
+      "shutdown_command": "echo 'CuSL' | sudo -S /sbin/halt -h -p",
+      "ssh_password": "{{user `ssh-password`}}",
+      "ssh_timeout": "20m",
+      "ssh_username": "{{user `ssh-user`}}",
+      "storage": [
+        {
+          "disk_size": "{{user `vm-disk-size`}}",
+          "disk_thin_provisioned": true
+        }
+      ],
+      "type": "vsphere-iso",
+      "username": "{{user `vsphere-user`}}",
+      "vcenter_server": "{{user `vsphere-server`}}",
+      "vm_name": "{{user `vm_name`}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "execute_command": "echo 'CuSL' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "scripts": [
+        "scripts/custom.sh",
+        "scripts/cleanup.sh"
+      ],
+      "type": "shell"
+    }
+  ],
+  "variables": {
+    "iso_checksum": "8bb2e75b03df72a41da9a28960b396106caf7125a1aa4eb999c0a45247511f45",
+    "iso_url": "[isos] ISOS/OS/LINUX/SUSE/openSUSE_LEAP/openSUSE-Leap-15.3-2-DVD-x86_64-Build24.5-Media.iso",
+    "ks_url": "[isos] Kickstart/Leap15-autoyast.iso",
+    "ssh-password": "{{ vault `/secret/data/config/ssh/admin_user` `password` }}",
+    "ssh-user": "{{ vault `/secret/data/config/ssh/admin_user` `username` }}",
+    "vm-cpu-num": "4",
+    "vm-disk-size": "102400",
+    "vm-mem-size": "8192",
+    "vm-name": "Leap15-Template",
+    "vm_name": "Leap15-Template",
+    "vsphere-cluster": "PRODUCTION",
+    "vsphere-datacenter": "Datacenter",
+    "vsphere-datastore": "isos",
+    "vsphere-folder": "Templates",
+    "vsphere-network-front": "Prd-epg",
+	"vsphere-network-back": "Backend-epg",
+    "vsphere-password": "{{ vault `/secret/data/config/vmware/technical_user` `password` }}",
+    "vsphere-server": "vcenter.domain.com",
+    "vsphere-user": "{{ vault `/secret/data/config/vmware/technical_user` `username` }}"
+  }
+}
