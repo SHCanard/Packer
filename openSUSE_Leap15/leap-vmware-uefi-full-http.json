@@ -63,6 +63,7 @@
     {
       "execute_command": "echo 'Leap15' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
       "scripts": [
+        "scripts/custom.sh",
         "scripts/cleanup.sh"
       ],
       "type": "shell"
